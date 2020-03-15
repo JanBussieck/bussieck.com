@@ -662,12 +662,20 @@ h6 {
 /* ---------------------------------------------------------- */
 
 .site-head {
+    position: relative;
     padding-top: 20px;
     padding-bottom: 20px;
     color: #fff;
-    background: var(--color-base);
+    background: #868686;
     background-position: center;
     background-size: cover;
+}
+
+.profile-image {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    max-height: 400px;
 }
 
 .site-nav-item {

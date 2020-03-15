@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
 import { Link, StaticQuery, graphql } from 'gatsby'
 import Img from 'gatsby-image'
+import profileImage from '../../images/jan-bussieck-gray.png';
 
 import { Navigation } from '.'
 import config from '../../utils/siteConfig'
@@ -35,7 +36,8 @@ const DefaultLayout = ({ data, children, bodyClass, isHome }) => {
 
                 <div className="viewport-top">
                     {/* The main header section on top of the screen */}
-                    <header className="site-head" style={{ ...site.cover_image && { backgroundImage: `url(${site.cover_image})` } }}>
+                    <header className="site-head">
+                        <img src={profileImage} className='profile-image'/>
                         <div className="container">
                             <div className="site-mast">
                                 <div className="site-mast-left">
