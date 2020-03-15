@@ -666,7 +666,8 @@ h6 {
     padding-top: 20px;
     padding-bottom: 20px;
     color: #fff;
-    background: #868686;
+    /* background: #868686; */
+    background: rgb(71, 85, 94);;
     background-position: center;
     background-size: cover;
 }
