@@ -26,6 +26,7 @@
   "scripts": {
     "serve": "gatsby build && NODE_ENV=production gatsby serve",
     "build": "gatsby build",
+    "build-production": "exit 0",
     "dev": "gatsby develop",
     "lint": "eslint . --ext .js --cache",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -57,6 +58,7 @@
     "lodash": "4.17.15",
     "react": "16.13.0",
     "react-dom": "16.13.0",
-    "react-helmet": "5.2.1"
+    "react-helmet": "5.2.1",
+    "react-text-loop": "^2.3.0"
   }
 }

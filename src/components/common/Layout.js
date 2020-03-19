@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
+import TextLoop from 'react-text-loop'
 import { Link, StaticQuery, graphql } from 'gatsby'
 import profileImage from '../../images/jan-bussieck-gray.png'
 import siteLogo from '../../images/logo.png'
@@ -53,8 +54,17 @@ const DefaultLayout = ({ data, children, bodyClass, isHome }) => {
                             </div>
                             { isHome ?
                                 <div className="site-banner">
+                                  <h1 className="site-banner-title">{"Hi! I'm Jan :)"}</h1>
+                                  <TextLoop>
+                                    <h1 className="site-banner-title">I build modern UIs with React</h1>
+                                    <h1 className="site-banner-title">I scale Rails codebases</h1>
+                                    <h1 className="site-banner-title">I run SaaS products</h1>
+                                    <h1 className="site-banner-title">I write on occasion</h1>
+                                  </TextLoop>
+                                  {/*
                                     <h1 className="site-banner-title">{site.title}</h1>
                                     <p className="site-banner-desc">{site.description}</p>
+                                  */}
                                 </div> :
                                 null}
                             <nav className="site-nav">
