@@ -1,0 +1,15 @@
+{
+  "plugins": [
+    ["prismjs", {
+        "languages": ["javascript", "css", "ruby"],
+        "plugins": ["line-numbers"],
+        "theme": "twilight",
+        "css": true
+    }]
+  ],
+  "presets": [
+    [
+      "babel-preset-gatsby"
+    ]
+  ]
+}

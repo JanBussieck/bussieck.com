@@ -1,10 +1,11 @@
-import React from 'react'
+import React, {useLayoutEffect} from 'react'
 import PropTypes from 'prop-types'
 import { graphql } from 'gatsby'
 import Helmet from 'react-helmet'
 
 import { Layout } from '../components/common'
 import { MetaData } from '../components/common/meta'
+import Prism from 'prismjs'
 
 /**
 * Single post view (/:slug)
@@ -14,6 +15,10 @@ import { MetaData } from '../components/common/meta'
 */
 const Post = ({ data, location }) => {
     const post = data.ghostPost
+
+    useLayoutEffect(() => {
+        Prism.highlightAll()
+    }, [])
 
     return (
         <>
@@ -25,7 +30,7 @@ const Post = ({ data, location }) => {
             <Helmet>
                 <style type="text/css">{`${post.codeinjection_styles}`}</style>
             </Helmet>
-            <Layout>
+            <Layout headerClass="post-header">
                 <div className="container">
                     <article className="content">
                         { post.feature_image ?

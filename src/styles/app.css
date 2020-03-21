@@ -216,10 +216,12 @@ mark {
 }
 code,
 kbd,
-pre,
 samp {
     font-family: monospace, monospace;
     font-size: 1em;
+}
+pre {
+  font-size: 1.5rem !important;
 }
 button,
 input,
@@ -670,6 +672,10 @@ h6 {
     background: rgb(71, 85, 94);;
     background-position: center;
     background-size: cover;
+}
+
+.post-header > .profile-image {
+  display: none;
 }
 
 .profile-image {

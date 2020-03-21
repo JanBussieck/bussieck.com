@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Helmet from 'react-helmet'
 import TextLoop from 'react-text-loop'
+import classNames from 'classnames'
 import { Link, StaticQuery, graphql } from 'gatsby'
 import profileImage from '../../images/jan-bussieck-gray.png'
 import siteLogo from '../../images/logo.png'
@@ -20,7 +21,7 @@ import '../../styles/app.css'
 * styles, and meta data for each page.
 *
 */
-const DefaultLayout = ({ data, children, bodyClass, isHome }) => {
+const DefaultLayout = ({ data, children, bodyClass, headerClass, isHome }) => {
     const site = data.allGhostSettings.edges[0].node
     const twitterUrl = site.twitter ? `https://twitter.com/${site.twitter.replace(/^@/, ``)}` : null
     const facebookUrl = site.facebook ? `https://www.facebook.com/${site.facebook.replace(/^\//, ``)}` : null
@@ -37,7 +38,7 @@ const DefaultLayout = ({ data, children, bodyClass, isHome }) => {
 
                 <div className="viewport-top">
                     {/* The main header section on top of the screen */}
-                    <header className="site-head">
+                    <header className={classNames("site-head", headerClass)}>
                         <img src={profileImage} className="profile-image"/>
                         <div className="container">
                             <div className="site-mast">
