@@ -58,8 +58,8 @@ const DefaultLayout = ({ data, children, bodyClass, headerClass, isHome }) => {
                                 <div className="site-banner">
                                   <h1 className="site-banner-title">{"Hi! I'm Jan :)"}</h1>
                                   <TextLoop>
-                                    <h1 className="site-banner-title">I build modern UIs with React</h1>
-                                    <h1 className="site-banner-title">I scale Rails codebases</h1>
+                                    <h1 className="site-banner-title">I build UIs with React</h1>
+                                    <h1 className="site-banner-title">I grow Rails codebases</h1>
                                     <h1 className="site-banner-title">I run SaaS products</h1>
                                     <h1 className="site-banner-title">I write on occasion</h1>
                                   </TextLoop>
@@ -75,7 +75,7 @@ const DefaultLayout = ({ data, children, bodyClass, headerClass, isHome }) => {
                                     <Navigation data={site.navigation} navClass="site-nav-item" />
                                 </div>
                                 <div className="site-nav-right">
-                                    <Link className="site-nav-button" to="/about">About</Link>
+                                    <Link className="site-nav-button" to="/now">About</Link>
                                 </div>
                             </nav>
                         </div>
