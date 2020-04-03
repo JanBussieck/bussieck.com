@@ -1,4 +1,123 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[bussieck.com]]></title><description><![CDATA[Thoughts, stories and ideas.]]></description><link>https://www.bussieck.com/</link><image><url>https://www.bussieck.com/logo.png</url><title>bussieck.com</title><link>https://www.bussieck.com/</link></image><generator>Ghost 2.9</generator><lastBuildDate>Tue, 31 Mar 2020 20:10:37 GMT</lastBuildDate><atom:link href="https://www.bussieck.com/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA['On Writing Software Well' II]]></title><description><![CDATA[Callbacks vs. Listeners
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0" xmlns:media="http://search.yahoo.com/mrss/"><channel><title><![CDATA[bussieck.com]]></title><description><![CDATA[Thoughts, stories and ideas.]]></description><link>https://www.bussieck.com/</link><image><url>https://www.bussieck.com/logo.png</url><title>bussieck.com</title><link>https://www.bussieck.com/</link></image><generator>Ghost 2.9</generator><lastBuildDate>Fri, 03 Apr 2020 16:45:57 GMT</lastBuildDate><atom:link href="https://www.bussieck.com/rss/" rel="self" type="application/rss+xml"/><ttl>60</ttl><item><title><![CDATA[Decouple from Redux Using Hooks]]></title><description><![CDATA[We can use redux hooks to fully decouple our react components from redux or any state management solution. This leads to cleaner code that is easier to change.]]></description><link>http://localhost:2368/decouple-from-redux-using-hooks/</link><guid isPermaLink="false">Ghost__Post__5e858c4e0a554e19673f4bf4</guid><category><![CDATA[react]]></category><category><![CDATA[redux]]></category><category><![CDATA[hooks]]></category><dc:creator><![CDATA[Jan Bussieck]]></dc:creator><pubDate>Fri, 03 Apr 2020 14:35:44 GMT</pubDate><media:content url="http://localhost:2368/content/images/2020/04/react-redux-decouple.png" medium="image"/><content:encoded><![CDATA[<img src="http://localhost:2368/content/images/2020/04/react-redux-decouple.png" alt="Decouple from Redux Using Hooks"/><p>Received wisdom in the react community holds that you should subdivide your components into 'smart' containers and 'dumb', presentational components.</p><p>The rationale is to separate concerns. Logic and behavior such as data fetching, any interaction with the outside world, dispatching actions and other side effects go into our smart container and what our UI should look like as a function of the resulting data into our dumb component.</p><p>This idea leads to a pervasive pattern of creating container components solely for the purpose of connecting a part of the component tree to the redux store. So we end up with two components; one in a <code>containers</code> folder fetching data from the store and passing down actions and the actual component in the <code>components</code> folder. </p><p>To me, this quickly felt cumbersome and rigid, if I simply wanted a component to have access to a slice of the store, I found myself having to create an intermediary container and changing a number of imports in other files that use the component.</p><p>I also stopped putting every bit of state into the redux store and instead took advantage of react's new and improved context api to <a href="https://kentcdodds.com/blog/colocation">co-locate state</a> that is confined to a specific, well-delineated part of the component tree. This raised questions such as whether consuming context should also only happen inside containers. </p><p>Besides, what are we really achieving by this kind of separation? Concerns about data access still has us change a number of files in the component tree and the hierarchy of our UI seems to dictate which components should be containers (by default the top level one).</p><p>While well-intentioned, the benefit of decoupling UI from state and behavior does not seem to warrant the overhead and complexity introduced by organizing files this way.</p><p>Luckily, we have a perfect tool to decouple data and behavior from our presentational components...</p><p>Hooks!</p><p>And wouldn't you know react-redux lets us consume its API only using hooks.</p><p>Let's look at a small (and admittedly contrived) example. Say, we want to implement a toggle button and keep the toggle state in the redux store, maybe it needs to be available globally, toggling an app wide setting.</p><p>This is what such a component could look like using redux classico:</p><pre><code class="language-javascript">import React from "react";
+import {connect} from "react-redux";
+import {toggleAction} from "./store/toggleActions";
+
+const Toggle = ({on, toggle}) =&gt; {
+  return (
+    &lt;button onClick={toggle}&gt;{on ? 'on' : 'off'}&lt;/button&gt;
+  );
+};
+
+const mapStateToProps = state =&gt; ({
+  on: state.toggle.on
+});
+
+const mapDispatchToProps = {toggle: toggleAction};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Toggle);
+</code></pre><p>Yes, we probably want this to be a container components wrapping a presentational component (e.g. a button) simply passing <code>on</code> and <code>toggle</code> down via props, but for the sake of simplicity we're keeping everything in one component.</p><p>Now let's refactor this to use the new redux hooks api:</p><pre><code class="language-javascript">import React from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {toggleAction} from "./store/toggleActions";
+
+const Toggle = () =&gt; {
+  const on = useSelector(state =&gt; state.toggle.on);
+  const dispatch = useDispatch();
+  return (
+    &lt;button onClick={() =&gt; dispatch(toggleAction())}&gt;{on ? 'on' : 'off'}&lt;/button&gt;
+  );
+}
+</code></pre><p>Not much of an improvement, we reduced some boilerplate, but there is still a lot of redux code sitting in our component. </p><p>The beauty of hooks is how composable they are, we can just create a custom <code>useToggle</code> hook:</p><pre><code class="language-javascript">import React from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {toggleAction} from "./store/toggleActions";
+
+const useToggle = () =&gt; {
+  const on = useSelector(state =&gt; state.toggle.on);
+  const dispatch = useDispatch();
+  const toggle = () =&gt;  dispatch(toggleAction());
+  return [on, toggle];
+};
+
+const Toggle = () =&gt; {
+  const [on, toggle] = useToggle();
+  return (
+    &lt;button onClick={toggle()}&gt;{on ? 'on' : 'off'}&lt;/button&gt;
+  );
+};</code></pre><p>Now our component knows nothing about redux, we did not need to create a <code>Toggle</code> container or some abstract HOC wrapping our button, we simply use a hook to encapsulates the data layer.</p><p>This way our components are also closed to modification, should we decide to employ a different state management solution. Moving redux state into react context simply involves rewriting the hook (at least for consumers of the context):</p><pre><code class="language-javascript">import ToggleContext from './ToggleContext';
+const useToggle = () =&gt; {
+  const {on, toggle} = useContext(ToggleContext);
+  return [on, toggle];
+};</code></pre><p>As I already alluded to, another disadvantage of the container pattern is that often the top-level component ends up being the container that fetches a slice of state from the store and passes it down to its children as props.</p><p>Take as an example a <code>BookList</code> container component that simply iterate over an array of books from the store and renders a <code>BookItem</code> in a list:</p><pre><code class="language-javascript">import React from "react";
+import {connect} from "react-redux";
+
+const BookItem = ({title, author}) =&gt; {
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{title}&lt;/h1&gt;
+      &lt;h2&gt;{`by ${author}`}&lt;/h2&gt;
+    &lt;/div&gt;
+  );
+};
+
+const BookList = ({books}) =&gt; {
+  return (
+    &lt;ul&gt;
+      {books.map(({book}) =&gt; {
+        return (
+          &lt;li key={book.id}&gt;
+            &lt;BookItem {...book} /&gt;
+          &lt;li&gt;
+        );
+      })}
+    &lt;/ul&gt;
+  )
+};
+
+const mapStateToProps = state =&gt; ({
+  books: state.books.index
+});
+
+export default connect(mapStateToProps)(BookList);</code></pre><p>A problem we might run into is that, if one book in the list is updated the entire list re-render which can quickly turn into an annoying performance issue. That is why it's a good practice to provide data as close to where it is needed as possible. </p><p>Instead of having to go in and add a <code>BookItem</code> container, we can just create a custom hook.</p><p>First <code>BookList</code> only receives an array of book ids, which presumably change less frequently than an any particular book:</p><pre><code class="language-javascript">import React from "react";
+import {connect} from "react-redux";
+
+const BookList = ({bookIds}) =&gt; {
+  return (
+    &lt;ul&gt;
+      {bookIds.map(({bookId}) =&gt; {
+        return (
+          &lt;li key={bookId}&gt;
+            &lt;BookItem id={bookId} /&gt;
+          &lt;li&gt;
+        )
+      })}
+    &lt;/ul&gt;
+  );
+};
+
+const mapStateToProps = state =&gt; ({
+  bookIds: state.books.ids
+});
+
+export default connect(mapStateToProps)(BookList);</code></pre><p>The <code>BookItem</code> then uses the book id to fetch its data from the store:</p><pre><code class="language-javascript">import React from "react";
+import {useSelector} from "react-redux";
+
+const BookItem = ({id}) =&gt; {
+  // we would normally pass a selector function here
+  const book = useSelector(state = state.booksById[id]);
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;{book.title}&lt;/h1&gt;
+      &lt;h2&gt;{`by ${book.author}`}&lt;/h2&gt;
+    &lt;/div&gt;
+  );
+};
+</code></pre><p>We can neatly bundle that and even add the action creator for updating a book in a custom <code>useBook</code> hook:</p><pre><code class="language-javascript">// src/store/hooks.js
+
+const useBook = (id) =&gt; {
+  const book = useSelector(getBook(id));
+  const dispatch = useDispatch();
+  const update = (...args) =&gt; dispatch(updateAction(id, ...args));
+  return [book, update];
+}</code></pre><p>Depending on how you structure your react redux projects you can include this hook as part of your <a href="https://github.com/erikras/ducks-modular-redux">redux-duck</a> or export it alongside actions and selectors inside your <code>redux</code> or <code>store</code> folder.</p><p>It is now easy to import a hook to consume data from our redux right where it is needed profiting from the above mentioned performance gains.</p><p>What is more, we effectively removed any trace of redux from our components, granted we still need to wrap everything in a <code>Provider</code>, but the overall footprint is vastly reduced. Now, wherever the tempestuous winds of the javascript ecosystem may carry you, you have a clean way of interacting with any state management solution you choose in the future given it exposes hooks that you can compose.</p><p>Ideally the, hooks allow all our components to be dumb.</p>]]></content:encoded></item><item><title><![CDATA['On Writing Software Well' II]]></title><description><![CDATA[Callbacks vs. Listeners
 We walk through how DHH employs callbacks in Basecamp to send mentions and I offer alternative approach moving code into the controller and using listeners for higher decoupling.]]></description><link>http://localhost:2368/on-writing-software-well-part-ii-callback/</link><guid isPermaLink="false">Ghost__Post__5e73dfb21baf0e7fa30dd914</guid><category><![CDATA[Ruby on Rails]]></category><category><![CDATA[Software Design]]></category><category><![CDATA[Tech]]></category><dc:creator><![CDATA[Jan Bussieck]]></dc:creator><pubDate>Thu, 19 Mar 2020 21:24:28 GMT</pubDate><media:content url="https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-1.2.1&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;w=2000&amp;fit=max&amp;ixid=eyJhcHBfaWQiOjExNzczfQ" medium="image"/><content:encoded><![CDATA[<h2 id="callbacks-vs-listeners">Callbacks vs. Listeners</h2><img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-1.2.1&q=80&fm=jpg&crop=entropy&cs=tinysrgb&w=2000&fit=max&ixid=eyJhcHBfaWQiOjExNzczfQ" alt="'On Writing Software Well' II"/><p>DHH remarks that he is a big fan of callbacks since they allow you to move a lot of incidental complexity off to the side while the rest of the code can pretend to be on a simple, default path shielding the programmer from a lot of the cognitive load that lives in callbacks instead.</p><p>To see what that means in practice, we are going to trace the mentions feature in Basecamp all the way down and pay attention to how callbacks are used to that end.</p><p>The entry point is the create action of the messages controller, which simply records a new message on a bucket (a bucket is an abstraction used to group certain entities, which will be explained in future episodes). The <code>new_message</code> method in turn simply instantiates a message, note that logic pertaining to the creation of mentions or actual recordings is missing from the controller.</p><pre><code class="language-ruby">class MessagesController &lt; ApplicationController
 ...
   def create
